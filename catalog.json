@@ -286,7 +286,7 @@
       "model": "Giulia",
       "yearFrom": 2016,
       "yearTo": 2026,
-      "file": "models/alfa_romeo_giulia.glb",
+      "file": "models/alfa_romeo_giulia_v2.glb",
       "paintMaterial": "EXT_carpaint",
       "plateMaterial": "plate",
       "initialOrbit": "35deg 72deg 105%",

@@ -485,13 +485,22 @@ def preview(glb_path, info, model_anchors, plate_material, out_png):
         server.terminate()
 
 
+def _published(path):
+    """Il file è già su GitHub (tracciato da git)?"""
+    return subprocess.run(['git', 'ls-files', '--error-unmatch', path], cwd=ROOT,
+                          capture_output=True).returncode == 0
+
+
 def unique_file(model_id, glb_path):
-    """Un file pubblicato non si cambia: se esiste già con un altro contenuto
-    si usa un nome nuovo (_v2, _v3...)."""
+    """Un file pubblicato non si cambia: se esiste già su GitHub con un altro
+    contenuto si usa un nome nuovo (_v2, _v3...). Quelli mai pubblicati si
+    sovrascrivono."""
     name, n = f'{model_id}.glb', 1
     while True:
         path = os.path.join(ROOT, 'models', name)
-        if not os.path.exists(path) or open(path, 'rb').read() == open(glb_path, 'rb').read():
+        if not _published(f'models/{name}'):
+            return f'models/{name}'
+        if os.path.exists(path) and open(path, 'rb').read() == open(glb_path, 'rb').read():
             return f'models/{name}'
         n += 1
         name = f'{model_id}_v{n}.glb'
