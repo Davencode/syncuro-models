@@ -3,8 +3,8 @@
 #
 #   tools/publish.sh v0.2.0
 #
-# Crea il tag, aggiorna index.json (che l'app legge da main) e svuota la
-# cache di jsDelivr per index.json, così l'app vede subito la nuova versione.
+# Crea il tag e aggiorna index.json, che l'app legge da GitHub raw: gli
+# utenti vedono la nuova versione entro 5 minuti.
 set -eu
 
 tag="${1:-}"
@@ -27,5 +27,4 @@ git add index.json
 git commit -m "Publish $tag"
 git push origin main
 
-curl -fsS "https://purge.jsdelivr.net/gh/Davencode/syncuro-models@main/index.json" > /dev/null
 echo "Pubblicato $tag"

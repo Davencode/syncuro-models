@@ -6,7 +6,9 @@ Modelli 3D dei veicoli per l'app Syncuro, serviti via
 ## Come li legge l'app
 
 1. `index.json` (da `main`) indica la versione corrente del catalogo:
-   `https://cdn.jsdelivr.net/gh/Davencode/syncuro-models@main/index.json`
+   `https://raw.githubusercontent.com/Davencode/syncuro-models/main/index.json`.
+   Non passa da jsDelivr: per un branch jsDelivr tiene in cache il commit per
+   ore, anche dopo un purge, e l'app vedrebbe la versione vecchia.
 2. Il catalogo di quella versione:
    `https://cdn.jsdelivr.net/gh/Davencode/syncuro-models@<tag>/catalog.json`
 3. Solo il modello dell'auto dell'utente:
