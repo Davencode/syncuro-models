@@ -35,10 +35,12 @@ from set_material import set_material  # noqa: E402
 ALLOWED_LICENSES = {'CC-BY-4.0': ('cc attribution', 'cc-by-4.0', 'creativecommons.org/licenses/by/4.0'),
                     'CC0-1.0': ('cc0', 'publicdomain/zero')}
 TIRE = re.compile(r'tire|tyre|pneu|gomma|rubber|reifen', re.I)
+# Gomma che non è pneumatico: guarnizioni, tappetini, parti dell'abitacolo.
+NOT_TIRE = re.compile(r'^int[_\s-]|interior|interno|guarniz|tappet|seal|mat\b|carpet', re.I)
 HIDDEN = re.compile(r'brake|freio|freno|disc|disco|caliper|pinza|interior|interno|\bint\b|seat|sedil|'
                     r'leather|engine|motor|mechanic|dashboard|speaker|wood', re.I)
 GLASS = re.compile(r'glass|vidro|vetro|window|glas|vitre|cristal', re.I)
-PAINT = re.compile(r'paint|pintura|carroz|vernice|body|carpaint|car_paint', re.I)
+PAINT = re.compile(r'paint|pintura|carroz|vernice|body|carpaint|car_paint|livrea|livery', re.I)
 NOT_PAINT = re.compile(r'plastic|chrome|cromad|rim|roda|tyre|tire|pneu|glass|vidro|window|light|farol|'
                        r'plate|targa|rubber|interior|interno', re.I)
 PLATE_PART = re.compile(r'plate|targa|licen[cs]e|matric', re.I)
@@ -271,7 +273,8 @@ def analyse(model, override):
     if hi[0] - lo[0] > (hi[2] - lo[2]) * 1.1:
         sys.exit('L\'auto è orientata lungo X: per ora sono supportati solo modelli lungo Z.')
 
-    tire_names = override.get('tireMaterials') or [m for m in model.materials if TIRE.search(m)]
+    tire_names = override.get('tireMaterials') or [
+        m for m in model.materials if TIRE.search(m) and not NOT_TIRE.search(m)]
     if not tire_names:
         sys.exit('Gomme non trovate: indica "tireMaterials" in vehicles/<id>.json.')
     cx = (lo[0] + hi[0]) / 2
@@ -286,7 +289,11 @@ def analyse(model, override):
         length = hi[2] - lo[2]
         best = None
         for name, tris in model.triangles_by_material().items():
-            if model.is_glass(name) or model.has_texture(name) or NOT_PAINT.search(name):
+            if model.is_glass(name) or NOT_PAINT.search(name):
+                continue
+            # Le vernici con un'immagine (livree, decalcomanie) valgono solo
+            # se il nome dice che sono vernice: l'immagine poi si toglie.
+            if model.has_texture(name) and not PAINT.search(name):
                 continue
             spans = [p for p in parts if name in p[1]]
             z0 = min(p[2][2] for p in spans)
@@ -321,6 +328,28 @@ def analyse(model, override):
             'height': height, 'roof': roof,
             'plate_boxes': plate_boxes(model, lo, hi),
             'tires': tire_names, 'hidden': [m for m in model.materials if HIDDEN.search(m)]}
+
+
+def plain_paint(src, dst, material_name):
+    """Toglie l'immagine dalla vernice: l'app la colora in modo uniforme, con la
+    stessa finitura di tutte le auto."""
+    with open(src, 'rb') as f:
+        data = f.read()
+    json_length = struct.unpack_from('<I', data, 12)[0]
+    gltf = json.loads(data[20:20 + json_length])
+    for material in gltf.get('materials', []):
+        if material.get('name') == material_name:
+            pbr = material.setdefault('pbrMetallicRoughness', {})
+            pbr.pop('baseColorTexture', None)
+            pbr['baseColorFactor'] = [1, 1, 1, 1]
+    chunk = json.dumps(gltf, separators=(',', ':')).encode()
+    chunk += b' ' * ((4 - len(chunk) % 4) % 4)
+    rest = data[20 + json_length:]
+    with open(dst, 'wb') as f:
+        f.write(struct.pack('<III', 0x46546C67, 2, 12 + 8 + len(chunk) + len(rest)))
+        f.write(struct.pack('<II', len(chunk), 0x4E4F534A))
+        f.write(chunk)
+        f.write(rest)
 
 
 def run(cmd, cwd=TOOLS):
@@ -585,6 +614,11 @@ def main():
     info = analyse(model, override)
     log(f'    muso verso {"+Z" if info["front"] > 0 else "-Z"}, vernice "{info["paint"]}", '
         f'gomme {info["tires"]}, tetto in vetro {info["roof"] or "no"}')
+    if model.has_texture(info['paint']):
+        plain = os.path.join(work, 'plain_paint.glb')
+        plain_paint(fixed, plain, info['paint'])
+        fixed = plain
+        log('    vernice con immagine: tolta, si colora come le altre auto')
     if info['roof']:
         roofed = os.path.join(work, 'roof.glb')
         set_material(fixed, roofed, [f'{n}={info["paint"]}' for n in info['roof']])
