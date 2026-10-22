@@ -489,6 +489,76 @@
         "retrievedOn": "2026-10-22",
         "changes": "Corretti i triangoli invertiti; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
       }
+    },
+    {
+      "id": "audi_a1",
+      "make": "Audi",
+      "model": "A1",
+      "yearFrom": 2019,
+      "yearTo": 2026,
+      "file": "models/audi_a1.glb",
+      "paintMaterial": "2021_Audi_A1_S-Line_Python_Yellow",
+      "plateMaterial": "plate",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "engine": [
+          {
+            "position": [0, 1.035, 1.533],
+            "normal": [0, 0.99, 0.15]
+          }
+        ],
+        "battery": [
+          {
+            "position": [0.528, 0.961, 1.799],
+            "normal": [0.22, 0.93, 0.29]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-0.528, 0.961, 1.799],
+            "normal": [-0.22, 0.93, 0.29]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [0, 1.583, -0.35],
+            "normal": [-0.01, 1, 0]
+          }
+        ],
+        "lights": [
+          {
+            "position": [0.726, 0.789, 2.047],
+            "normal": [0.55, 0.45, 0.71]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [0.986, 0.356, 1.399],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.986, 0.356, 1.399],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [0.986, 0.356, -1.516],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.986, 0.356, -1.516],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "Audi A1 Quattro (A1II)",
+        "author": "GT Cars: Hyperspeed",
+        "authorUrl": "https://sketchfab.com/Car2022",
+        "sourceUrl": "https://sketchfab.com/3d-models/audi-a1-quattro-a1ii-c0ca74fba3b24326b898bfc556909b57",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
+      }
     }
   ]
 }
