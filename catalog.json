@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "models": [
+    {
+      "id": "volkswagen_golf_8",
+      "make": "Volkswagen",
+      "model": "Golf",
+      "yearFrom": 2020,
+      "yearTo": 2024,
+      "file": "models/volkswagen_golf_8.glb",
+      "paintMaterial": "Meshesuntitleduniqueid1500011Mtl",
+      "initialOrbit": "215deg 72deg 105%",
+      "anchors": {
+        "lights": [{ "position": [7.2, 2.5, -23.3], "normal": [-0.5, 0.1, -0.85] }],
+        "engine": [{ "position": [9.43, 3.742, -20.2], "normal": [0, 0.99, -0.12] }],
+        "battery": [{ "position": [7.43, 3.249, -22.4], "normal": [-0.03, 0.95, -0.31] }],
+        "fluids": [{ "position": [11.43, 3.248, -22.4], "normal": [0.03, 0.95, -0.31] }],
+        "cabin": [{ "position": [9.43, 5.504, -14.2], "normal": [0, 1, 0] }],
+        "wheels": [
+          { "position": [6.15, 1.24, -20.74], "normal": [-1, 0, 0] },
+          { "position": [12.65, 1.24, -20.74], "normal": [1, 0, 0] },
+          { "position": [6.15, 1.24, -10.86], "normal": [-1, 0, 0] },
+          { "position": [12.65, 1.24, -10.86], "normal": [1, 0, 0] }
+        ]
+      },
+      "attribution": {
+        "title": "Volkswagen Golf 8. GTI (A8)",
+        "author": "Mona x Supercars",
+        "authorUrl": "https://sketchfab.com/Car2022",
+        "sourceUrl": "https://sketchfab.com/3d-models/volkswagen-golf-8-gti-a8-e87d7c0f8937481db236529beb5ecab7",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Ottimizzato (quantizzazione geometria, texture WebP 1024 px); colore della carrozzeria modificato nell'app."
+      }
+    }
+  ]
+}
