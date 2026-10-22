@@ -279,6 +279,76 @@
         "retrievedOn": "2026-10-22",
         "changes": "Corretti i triangoli invertiti; tetto in vetro reso in tinta carrozzeria; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
       }
+    },
+    {
+      "id": "alfa_romeo_giulia",
+      "make": "Alfa Romeo",
+      "model": "Giulia",
+      "yearFrom": 2016,
+      "yearTo": 2026,
+      "file": "models/alfa_romeo_giulia.glb",
+      "paintMaterial": "EXT_carpaint",
+      "plateMaterial": "plate",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "engine": [
+          {
+            "position": [0.008, 0.966, 1.368],
+            "normal": [-0.01, 0.99, 0.15]
+          }
+        ],
+        "battery": [
+          {
+            "position": [0.507, 0.855, 1.694],
+            "normal": [-0.07, 0.97, 0.24]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-0.492, 0.87, 1.694],
+            "normal": [-0.2, 0.94, 0.26]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [0.008, 1.436, -0.327],
+            "normal": [0.02, 1.0, 0.06]
+          }
+        ],
+        "lights": [
+          {
+            "position": [0.695, 0.901, 1.392],
+            "normal": [0.45, 0.87, 0.19]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [1.026, 0.351, 1.205],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-1.01, 0.351, 1.205],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [1.026, 0.351, -1.349],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-1.01, 0.351, -1.349],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "Alfa Romeo Giulia Quadrifoglio",
+        "author": "ijiklvn",
+        "authorUrl": "https://sketchfab.com/kelvin-carvalho",
+        "sourceUrl": "https://sketchfab.com/3d-models/alfa-romeo-giulia-quadrifoglio-7a5e219a35ed49e99b91fb1a085d8528",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Corretti i triangoli invertiti; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
+      }
     }
   ]
 }
