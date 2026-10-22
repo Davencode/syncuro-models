@@ -47,6 +47,17 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    python3 tools/fix_winding.py originale.glb corretto.glb
    ```
 
+   Per cambiare il materiale di una parte (es. un tetto in vetro da rendere
+   in tinta con la carrozzeria, così l'app lo ricolora):
+
+   ```sh
+   python3 tools/set_material.py corretto.glb modificato.glb Object_85=Carro_Pintura
+   ```
+
+   Se le gomme non si semplificano (normali sfaccettate che impediscono di
+   unire i vertici), togli loro le normali prima di semplificare: la gomma
+   nera non ne risente.
+
 3. **Se è troppo pesante** (molto più di 300k triangoli), semplificalo in
    modo selettivo: le parti secondarie in modo forte, la carrozzeria solo
    dove la forma non cambia. Una semplificazione uniforme ammacca la

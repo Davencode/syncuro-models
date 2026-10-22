@@ -139,6 +139,75 @@
         "retrievedOn": "2026-10-22",
         "changes": "Corretto l'orientamento dei triangoli invertiti; carrozzeria intatta, semplificate le parti secondarie (da 4,7 milioni a circa 710 mila triangoli); geometria quantizzata, texture WebP 1024 px; colore della carrozzeria e targa modificati nell'app."
       }
+    },
+    {
+      "id": "peugeot_208_ii",
+      "make": "Peugeot",
+      "model": "208",
+      "yearFrom": 2020,
+      "yearTo": 2026,
+      "file": "models/peugeot_208_ii.glb",
+      "paintMaterial": "Carro_Pintura",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "lights": [
+          {
+            "position": [0.6, 0.72, 1.79],
+            "normal": [0.53, 0.17, 0.83]
+          }
+        ],
+        "engine": [
+          {
+            "position": [0.0, 0.947, 1.5],
+            "normal": [0, 0.99, 0.16]
+          }
+        ],
+        "battery": [
+          {
+            "position": [0.42, 0.848, 1.75],
+            "normal": [0.06, 0.95, 0.31]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-0.42, 0.848, 1.75],
+            "normal": [-0.06, 0.95, 0.31]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [0.0, 1.446, -0.3],
+            "normal": [0, 1, 0]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [0.86, 0.315, 1.2],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.86, 0.315, 1.2],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [0.86, 0.315, -1.35],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.86, 0.315, -1.35],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "2021 Peugeot 208",
+        "author": "tonielpro520",
+        "authorUrl": "https://sketchfab.com/tonielpro520",
+        "sourceUrl": "https://sketchfab.com/3d-models/2021-peugeot-208-c3a458884cf7434fa99b2172c96061a4",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Tetto in vetro reso in tinta carrozzeria; semplificati pneumatici, dischi freno e interni (da circa 540 mila a 340 mila triangoli); geometria quantizzata, texture WebP 1024 px; colore della carrozzeria modificato nell'app."
+      }
     }
   ]
 }
