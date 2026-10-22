@@ -71,6 +71,8 @@ class Glb:
     def triangles(self):
         for _, matrix, mesh in self.world_meshes():
             for prim in mesh['primitives']:
+                if prim.get('mode', 4) != 4:
+                    continue  # linee e punti non sono superfici
                 points = [_apply(matrix, p) for p in self.accessor(prim['attributes']['POSITION'])]
                 indices = ([i[0] for i in self.accessor(prim['indices'])]
                            if 'indices' in prim else list(range(len(points))))

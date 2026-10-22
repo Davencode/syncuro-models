@@ -69,6 +69,8 @@ class Model:
             lo, hi = [math.inf] * 3, [-math.inf] * 3
             mats, tris = set(), 0
             for prim in mesh['primitives']:
+                if prim.get('mode', 4) != 4:
+                    continue
                 acc = g['accessors'][prim['attributes']['POSITION']]
                 scale = {5122: 32767, 5120: 127, 5123: 65535, 5121: 255}.get(acc['componentType'], 1) \
                     if acc.get('normalized') else 1
@@ -104,66 +106,25 @@ class Model:
 
 
 class Raycaster:
-    """Raggi paralleli agli assi, con una griglia per non testare tutti i
-    triangoli a ogni raggio."""
+    """Raggi paralleli agli assi, calcolati da tools/raycast_server.mjs: in
+    Python sarebbero troppo lenti su modelli da centinaia di migliaia di
+    triangoli. Il modello si carica una volta sola."""
 
-    CELL = 0.05
-
-    def __init__(self, glb):
-        self.tris = list(glb.triangles())
-        self.names = [m.get('name', f'#{i}') for i, m in enumerate(glb.gltf.get('materials', []))]
-        self.grids = {}
-
-    def _grid(self, axis):
-        if axis not in self.grids:
-            u, v = [k for k in range(3) if k != axis]
-            grid = {}
-            for i, (a, b, c, _) in enumerate(self.tris):
-                u0, u1 = min(a[u], b[u], c[u]), max(a[u], b[u], c[u])
-                v0, v1 = min(a[v], b[v], c[v]), max(a[v], b[v], c[v])
-                for cu in range(math.floor(u0 / self.CELL), math.floor(u1 / self.CELL) + 1):
-                    for cv in range(math.floor(v0 / self.CELL), math.floor(v1 / self.CELL) + 1):
-                        grid.setdefault((cu, cv), []).append(i)
-            self.grids[axis] = (u, v, grid)
-        return self.grids[axis]
+    def __init__(self, path):
+        self.process = subprocess.Popen(['node', '--max-old-space-size=4096', 'raycast_server.mjs', path], cwd=TOOLS, text=True,
+                                        stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1)
+        ready = self.process.stdout.readline().strip()
+        if ready != 'pronto':
+            sys.exit(f'Server dei raggi non avviato: {ready}')
 
     def cast(self, origin, axis, sign):
         """Primo punto colpito da un raggio lungo [axis] (0, 1, 2) nel verso [sign]."""
-        u, v, grid = self._grid(axis)
-        cell = (math.floor(origin[u] / self.CELL), math.floor(origin[v] / self.CELL))
-        d = [0.0, 0.0, 0.0]
-        d[axis] = float(sign)
-        best = None
-        for i in grid.get(cell, ()):
-            a, b, c, mat = self.tris[i]
-            e1 = [b[k] - a[k] for k in range(3)]
-            e2 = [c[k] - a[k] for k in range(3)]
-            p = [d[1] * e2[2] - d[2] * e2[1], d[2] * e2[0] - d[0] * e2[2], d[0] * e2[1] - d[1] * e2[0]]
-            det = sum(e1[k] * p[k] for k in range(3))
-            if abs(det) < 1e-12:
-                continue
-            t0 = [origin[k] - a[k] for k in range(3)]
-            uu = sum(t0[k] * p[k] for k in range(3)) / det
-            if uu < 0 or uu > 1:
-                continue
-            q = [t0[1] * e1[2] - t0[2] * e1[1], t0[2] * e1[0] - t0[0] * e1[2], t0[0] * e1[1] - t0[1] * e1[0]]
-            vv = sum(d[k] * q[k] for k in range(3)) / det
-            if vv < 0 or uu + vv > 1:
-                continue
-            t = sum(e2[k] * q[k] for k in range(3)) / det
-            if t > 1e-6 and (best is None or t < best[0]):
-                n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]]
-                length = math.sqrt(sum(x * x for x in n)) or 1
-                n = [x / length for x in n]
-                if sum(n[k] * d[k] for k in range(3)) > 0:
-                    n = [-x for x in n]
-                best = (t, mat, n)
-        if best is None:
-            return None
-        t, mat, n = best
-        point = [origin[k] + d[k] * t for k in range(3)]
-        return {'position': [round(x, 3) for x in point], 'normal': [round(x, 2) for x in n],
-                'material': self.names[mat] if mat is not None else None}
+        self.process.stdin.write(f'{origin[0]} {origin[1]} {origin[2]} {axis} {sign}\n')
+        return json.loads(self.process.stdout.readline())
+
+    def close(self):
+        self.process.stdin.close()
+        self.process.wait()
 
 
 # --- Passi ----------------------------------------------------------------------
@@ -352,6 +313,69 @@ def plain_paint(src, dst, material_name):
         f.write(rest)
 
 
+def drop_lines(src, dst):
+    """Toglie linee e punti (es. i bordi esportati da SketchUp): non sono
+    superfici, falsano le misure e nell'app comparirebbero come contorni."""
+    with open(src, 'rb') as f:
+        data = f.read()
+    json_length = struct.unpack_from('<I', data, 12)[0]
+    gltf = json.loads(data[20:20 + json_length])
+    removed = 0
+    for mesh in gltf['meshes']:
+        kept = [p for p in mesh['primitives'] if p.get('mode', 4) == 4]
+        removed += len(mesh['primitives']) - len(kept)
+        mesh['primitives'] = kept
+    empty = {i for i, m in enumerate(gltf['meshes']) if not m['primitives']}
+    for node in gltf['nodes']:
+        if node.get('mesh') in empty:
+            del node['mesh']
+    if not removed:
+        return 0
+    chunk = json.dumps(gltf, separators=(',', ':')).encode()
+    chunk += b' ' * ((4 - len(chunk) % 4) % 4)
+    rest = data[20 + json_length:]
+    with open(dst, 'wb') as f:
+        f.write(struct.pack('<III', 0x46546C67, 2, 12 + 8 + len(chunk) + len(rest)))
+        f.write(struct.pack('<II', len(chunk), 0x4E4F534A))
+        f.write(chunk)
+        f.write(rest)
+    return removed
+
+
+def to_meters(src, dst):
+    """Porta il modello in metri, centrato e con le ruote a terra: tutte le
+    misure dello script (targhe, distanze) sono in metri. L'unità si sceglie
+    tra metri, centimetri, pollici e millimetri: quella che dà all'auto una
+    lunghezza realistica."""
+    model = Model(src)
+    lo = [min(p[2][k] for p in model.parts) for k in range(3)]
+    hi = [max(p[3][k] for p in model.parts) for k in range(3)]
+    length = max(hi[0] - lo[0], hi[2] - lo[2])
+    scale = next((f for f in (1, 0.01, 0.0254, 0.001) if 2.5 <= length * f <= 6.5), None)
+    if scale is None:
+        sys.exit(f'Dimensioni strane (lunghezza {length:.2f}): non riconosco l\'unità di misura.')
+    cx, cz = (lo[0] + hi[0]) / 2, (lo[2] + hi[2]) / 2
+    if scale == 1 and abs(cx) < 0.05 and abs(cz) < 0.05 and abs(lo[1]) < 0.05:
+        return None
+    with open(src, 'rb') as f:
+        data = f.read()
+    json_length = struct.unpack_from('<I', data, 12)[0]
+    gltf = json.loads(data[20:20 + json_length])
+    scene = gltf['scenes'][gltf.get('scene', 0)]
+    gltf['nodes'].append({'name': 'syncuro_root', 'children': scene['nodes'], 'scale': [scale] * 3,
+                          'translation': [-cx * scale, -lo[1] * scale, -cz * scale]})
+    scene['nodes'] = [len(gltf['nodes']) - 1]
+    chunk = json.dumps(gltf, separators=(',', ':')).encode()
+    chunk += b' ' * ((4 - len(chunk) % 4) % 4)
+    rest = data[20 + json_length:]
+    with open(dst, 'wb') as f:
+        f.write(struct.pack('<III', 0x46546C67, 2, 12 + 8 + len(chunk) + len(rest)))
+        f.write(struct.pack('<II', len(chunk), 0x4E4F534A))
+        f.write(chunk)
+        f.write(rest)
+    return scale
+
+
 def run(cmd, cwd=TOOLS):
     result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
     if result.returncode != 0:
@@ -375,10 +399,35 @@ def simplify(src, work, info):
     return current
 
 
+def triangle_count(path):
+    """Dai metadati del file: leggere tutti i triangoli sarebbe lento."""
+    gltf = Glb(path).gltf
+    total = 0
+    for mesh in gltf['meshes']:
+        for prim in mesh['primitives']:
+            acc = gltf['accessors'][prim['indices'] if 'indices' in prim else prim['attributes']['POSITION']]
+            total += acc['count'] // 3
+    return total
+
+
+def lighten(src, work, info, model):
+    """Se resta molto pesante, alleggerisce le parti secondarie (cromature,
+    cerchi, griglie...) con tools/lighten.mjs; vernice, vetri, luci e
+    portatarga restano intatti."""
+    keep = {info['paint']} | {m for m in model.materials
+                              if model.is_glass(m) or PLATE_PART.search(m) or LIGHT.search(m)
+                              or TAILLIGHT.search(m)}
+    targets = [m for m in model.materials if m not in keep]
+    dst = os.path.join(work, 'light.glb')
+    out = run(['node', 'lighten.mjs', src, dst, ','.join(targets), '0.25', '0.001'])
+    log('    ' + out.strip())
+    return dst
+
+
 def optimize(src, dst):
     run(['npx', '-y', '@gltf-transform/cli@4', 'optimize', src, dst, '--compress', 'quantize',
          '--texture-compress', 'webp', '--texture-size', '1024', '--palette', 'false',
-         '--simplify', 'false', '--prune-attributes', 'false'])
+         '--simplify', 'false'])  # le targhe si aggiungono dopo: le UV inutili si possono togliere
 
 
 def anchors(ray, info):
@@ -537,7 +586,7 @@ def preview(glb_path, info, model_anchors, plate_material, out_png):
     try:
         time.sleep(1)
         run(['node', 'preview_shot.mjs', 'http://127.0.0.1:8799/preview.html', out_png, '1400', '1000',
-             '25000'])
+             '60000'])
     finally:
         server.terminate()
 
@@ -608,6 +657,13 @@ def main():
     fixed = os.path.join(work, 'fixed.glb')
     flipped, total = fix_winding(args.source, fixed)
     log(f'    girati {flipped} su {total}')
+    lines = drop_lines(fixed, fixed)
+    if lines:
+        log(f'    tolte {lines} parti fatte di linee (non superfici)')
+    scale = to_meters(fixed, fixed)
+    if scale:
+        unit = {1: 'metri', 0.01: 'centimetri', 0.0254: 'pollici', 0.001: 'millimetri'}[scale]
+        log(f'    modello in {unit}: portato in metri e centrato')
 
     log('3/8 analisi')
     model = Model(fixed)
@@ -624,8 +680,12 @@ def main():
         set_material(fixed, roofed, [f'{n}={info["paint"]}' for n in info['roof']])
         fixed = roofed
 
-    log('4/8 semplificazione e ottimizzazione')
+    log('4/8 semplificazione e ottimizzazione (può richiedere qualche minuto)')
     reduced = simplify(fixed, work, info)
+    count = triangle_count(reduced)
+    if count > 450_000:
+        log(f'    {count} triangoli: alleggerisco le parti secondarie')
+        reduced = lighten(reduced, work, info, model)
     optimized = os.path.join(work, 'optimized.glb')
     optimize(reduced, optimized)
     final_model = Glb(optimized)
@@ -634,7 +694,7 @@ def main():
         sys.exit(f'L\'ottimizzazione ha perso il materiale "{info["paint"]}".')
 
     log('5/8 punti dei componenti')
-    ray = Raycaster(final_model)
+    ray = Raycaster(optimized)
     model_anchors = anchors(ray, info)
     for key, value in override.get('anchors', {}).items():
         model_anchors[key] = value
@@ -646,6 +706,7 @@ def main():
         log(f'    {label}: {spec or "non trovata"}')
         if spec:
             plates.append(spec)
+    ray.close()
     final = os.path.join(work, 'final.glb')
     if plates and not override.get('noPlates'):
         add_plates(optimized, final, plates)
@@ -684,7 +745,7 @@ def main():
                           f'| {license_link} | {entry["attribution"]["retrievedOn"]} | {changes} |')
 
     size = os.path.getsize(os.path.join(ROOT, file)) / 1e6
-    triangles = sum(1 for _ in final_model.triangles())
+    triangles = triangle_count(final)
     log(f'\nFatto: {file} ({size:.1f} MB, {triangles} triangoli).')
     log(f'Anteprima: {preview_png}')
     log('Se va bene: committa e pubblica con tools/publish.sh vX.Y.Z. '
