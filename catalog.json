@@ -209,6 +209,76 @@
         "retrievedOn": "2026-10-22",
         "changes": "Tetto in vetro reso in tinta carrozzeria; semplificati pneumatici, dischi freno e interni (da circa 540 mila a 340 mila triangoli); geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
       }
+    },
+    {
+      "id": "jeep_compass",
+      "make": "Jeep",
+      "model": "Compass",
+      "yearFrom": 2021,
+      "yearTo": 2026,
+      "file": "models/jeep_compass.glb",
+      "paintMaterial": "00_-_BODY",
+      "plateMaterial": "plate",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "engine": [
+          {
+            "position": [-0.0, 0.56, 1.597],
+            "normal": [-0.01, 0.99, 0.13]
+          }
+        ],
+        "battery": [
+          {
+            "position": [0.54, 0.471, 1.908],
+            "normal": [0.14, 0.97, 0.19]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-0.541, 0.471, 1.908],
+            "normal": [-0.14, 0.97, 0.19]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [-0.0, 1.093, -0.319],
+            "normal": [-0.01, 1.0, 0.01]
+          }
+        ],
+        "lights": [
+          {
+            "position": [0.743, 0.295, 2.173],
+            "normal": [0.64, 0.33, 0.69]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [0.998, -0.332, 1.441],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.998, -0.332, 1.441],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [0.998, -0.332, -1.492],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.998, -0.332, -1.492],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "JEEP COMPASS 2021",
+        "author": "fazt.3ds",
+        "authorUrl": "https://sketchfab.com/fazt.3ds",
+        "sourceUrl": "https://sketchfab.com/3d-models/jeep-compass-2021-7181289a07794a6ead28ffd56bfbbc1d",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Corretti i triangoli invertiti; tetto in vetro reso in tinta carrozzeria; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
+      }
     }
   ]
 }
