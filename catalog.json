@@ -419,6 +419,76 @@
         "retrievedOn": "2026-10-22",
         "changes": "Corretti i triangoli invertiti; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
       }
+    },
+    {
+      "id": "abarth_500",
+      "make": "Abarth",
+      "model": "500",
+      "yearFrom": 2008,
+      "yearTo": 2024,
+      "file": "models/abarth_500.glb",
+      "paintMaterial": "CAR_Livrea",
+      "plateMaterial": "plate",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "engine": [
+          {
+            "position": [0.0, 0.96, 0.906],
+            "normal": [0.0, 0.97, 0.24]
+          }
+        ],
+        "battery": [
+          {
+            "position": [0.455, 0.867, 1.14],
+            "normal": [0.16, 0.91, 0.39]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-0.455, 0.867, 1.14],
+            "normal": [-0.16, 0.91, 0.39]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [0.0, 1.483, -0.593],
+            "normal": [0.04, 1.0, 0.01]
+          }
+        ],
+        "lights": [
+          {
+            "position": [0.626, 0.92, 0.883],
+            "normal": [0.24, 0.94, 0.25]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [0.82, 0.296, 0.788],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.82, 0.296, 0.788],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [0.82, 0.296, -1.513],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.82, 0.296, -1.513],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "Fiat Abarth 500",
+        "author": "Luquita",
+        "authorUrl": "https://sketchfab.com/speedmodel",
+        "sourceUrl": "https://sketchfab.com/3d-models/fiat-abarth-500-b59a403dfa1d40318c1126e658f87c19",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Corretti i triangoli invertiti; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
+      }
     }
   ]
 }
