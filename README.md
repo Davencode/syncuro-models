@@ -47,10 +47,21 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    python3 tools/fix_winding.py originale.glb corretto.glb
    ```
 
-3. **Ottimizzalo** in `models/<marca>_<modello>_<generazione>.glb`. Se ha
-   molti più di 200k triangoli aggiungi
-   `--simplify true --simplify-ratio 0.05 --simplify-error 0.001` e ricontrolla
-   l'aspetto:
+3. **Se è troppo pesante** (molto più di 300k triangoli), semplificalo in
+   modo selettivo: le parti secondarie in modo forte, la carrozzeria solo
+   dove la forma non cambia. Una semplificazione uniforme ammacca la
+   vernice, perché i riflessi mostrano ogni deformazione.
+
+   ```sh
+   (cd tools && npm install)
+   node tools/simplify_except.mjs corretto.glb passo1.glb body 0.05 0.005
+   node tools/simplify_except.mjs passo1.glb ridotto.glb '!body' 0.3 0.0001
+   ```
+
+   Il terzo argomento è il materiale della carrozzeria (`!` davanti: solo
+   quello), poi la quota di vertici da tenere e la tolleranza (frazione
+   dell'ingombro). Ricontrolla sempre l'aspetto.
+4. **Ottimizzalo** in `models/<marca>_<modello>_<generazione>.glb`:
 
    ```sh
    npx @gltf-transform/cli@4 optimize originale.glb models/<id>.glb \
@@ -62,7 +73,7 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    viene fuso con gli altri e non si può più ricolorare. Niente Draco o
    Meshopt: richiederebbero decoder scaricati da internet e il modello non
    funzionerebbe offline.
-4. **Analizzalo** con `tools/glb_tool.py`:
+5. **Analizzalo** con `tools/glb_tool.py`:
 
    ```sh
    python3 tools/glb_tool.py info models/<id>.glb
@@ -77,7 +88,7 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
      verso +Z, `35deg` mostra il tre quarti anteriore sinistro; con il muso
      verso -Z, `215deg`.
 
-5. **Calcola i punti** sparando raggi verso la superficie: dall'alto per
+6. **Calcola i punti** sparando raggi verso la superficie: dall'alto per
    cofano e tetto, di lato all'altezza dei mozzi per le ruote, dal davanti
    per i fari.
 
@@ -88,6 +99,6 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    Il risultato (`position`, `normal`) va in `anchors`. I punti delle ruote
    vanno spostati di qualche centimetro verso l'esterno, così la spalla
    dello pneumatico non li copre.
-6. **Aggiungi la voce** in `catalog.json` e la riga in `CREDITS.md`, poi
+7. **Aggiungi la voce** in `catalog.json` e la riga in `CREDITS.md`, poi
    committa.
-7. **Pubblica**: `tools/publish.sh v0.2.0`.
+8. **Pubblica**: `tools/publish.sh v0.2.0`.
