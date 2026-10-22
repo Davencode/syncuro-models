@@ -58,6 +58,10 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    unire i vertici), togli loro le normali prima di semplificare: la gomma
    nera non ne risente.
 
+   ```sh
+   node tools/strip_normals.mjs modificato.glb senza_normali.glb Carro_Pneu1
+   ```
+
 3. **Se è troppo pesante** (molto più di 300k triangoli), semplificalo in
    modo selettivo: le parti secondarie in modo forte, la carrozzeria solo
    dove la forma non cambia. Una semplificazione uniforme ammacca la
