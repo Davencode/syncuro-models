@@ -37,7 +37,18 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
 
 1. **Scarica il `.glb` originale** e verifica la licenza (vedi la guida
    `docs/modelli-3d.md` nel repository dell'app).
-2. **Ottimizzalo** in `models/<marca>_<modello>_<generazione>.glb`:
+2. **Controllalo** in un visualizzatore: se sulla vernice compaiono schegge
+   chiare a triangoli, l'orientamento dei triangoli è incoerente. Correggilo
+   prima di ottimizzare:
+
+   ```sh
+   python3 tools/fix_winding.py originale.glb corretto.glb
+   ```
+
+3. **Ottimizzalo** in `models/<marca>_<modello>_<generazione>.glb`. Se ha
+   molti più di 200k triangoli aggiungi
+   `--simplify true --simplify-ratio 0.05 --simplify-error 0.001` e ricontrolla
+   l'aspetto:
 
    ```sh
    npx @gltf-transform/cli@4 optimize originale.glb models/<id>.glb \
@@ -49,7 +60,7 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    viene fuso con gli altri e non si può più ricolorare. Niente Draco o
    Meshopt: richiederebbero decoder scaricati da internet e il modello non
    funzionerebbe offline.
-3. **Analizzalo** con `tools/glb_tool.py`:
+4. **Analizzalo** con `tools/glb_tool.py`:
 
    ```sh
    python3 tools/glb_tool.py info models/<id>.glb
@@ -64,7 +75,7 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
      verso +Z, `35deg` mostra il tre quarti anteriore sinistro; con il muso
      verso -Z, `215deg`.
 
-4. **Calcola i punti** sparando raggi verso la superficie: dall'alto per
+5. **Calcola i punti** sparando raggi verso la superficie: dall'alto per
    cofano e tetto, di lato all'altezza dei mozzi per le ruote, dal davanti
    per i fari.
 
@@ -75,6 +86,6 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    Il risultato (`position`, `normal`) va in `anchors`. I punti delle ruote
    vanno spostati di qualche centimetro verso l'esterno, così la spalla
    dello pneumatico non li copre.
-5. **Aggiungi la voce** in `catalog.json` e la riga in `CREDITS.md`, poi
+6. **Aggiungi la voce** in `catalog.json` e la riga in `CREDITS.md`, poi
    committa.
-6. **Pubblica**: `tools/publish.sh v0.2.0`.
+7. **Pubblica**: `tools/publish.sh v0.2.0`.

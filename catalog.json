@@ -11,16 +11,53 @@
       "paintMaterial": "Meshesuntitleduniqueid1500011Mtl",
       "initialOrbit": "215deg 72deg 105%",
       "anchors": {
-        "lights": [{ "position": [7.2, 2.5, -23.3], "normal": [-0.5, 0.1, -0.85] }],
-        "engine": [{ "position": [9.43, 3.742, -20.2], "normal": [0, 0.99, -0.12] }],
-        "battery": [{ "position": [7.43, 3.249, -22.4], "normal": [-0.03, 0.95, -0.31] }],
-        "fluids": [{ "position": [11.43, 3.248, -22.4], "normal": [0.03, 0.95, -0.31] }],
-        "cabin": [{ "position": [9.43, 5.504, -14.2], "normal": [0, 1, 0] }],
+        "lights": [
+          {
+            "position": [7.2, 2.5, -23.3],
+            "normal": [-0.5, 0.1, -0.85]
+          }
+        ],
+        "engine": [
+          {
+            "position": [9.43, 3.742, -20.2],
+            "normal": [0, 0.99, -0.12]
+          }
+        ],
+        "battery": [
+          {
+            "position": [7.43, 3.249, -22.4],
+            "normal": [-0.03, 0.95, -0.31]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [11.43, 3.248, -22.4],
+            "normal": [0.03, 0.95, -0.31]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [9.43, 5.504, -14.2],
+            "normal": [0, 1, 0]
+          }
+        ],
         "wheels": [
-          { "position": [6.15, 1.24, -20.74], "normal": [-1, 0, 0] },
-          { "position": [12.65, 1.24, -20.74], "normal": [1, 0, 0] },
-          { "position": [6.15, 1.24, -10.86], "normal": [-1, 0, 0] },
-          { "position": [12.65, 1.24, -10.86], "normal": [1, 0, 0] }
+          {
+            "position": [6.15, 1.24, -20.74],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [12.65, 1.24, -20.74],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [6.15, 1.24, -10.86],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [12.65, 1.24, -10.86],
+            "normal": [1, 0, 0]
+          }
         ]
       },
       "attribution": {
@@ -31,6 +68,75 @@
         "license": "CC-BY-4.0",
         "retrievedOn": "2026-10-22",
         "changes": "Ottimizzato (quantizzazione geometria, texture WebP 1024 px); colore della carrozzeria modificato nell'app."
+      }
+    },
+    {
+      "id": "opel_corsa_f",
+      "make": "Opel",
+      "model": "Corsa",
+      "yearFrom": 2020,
+      "yearTo": 2026,
+      "file": "models/opel_corsa_f.glb",
+      "paintMaterial": "body",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "lights": [
+          {
+            "position": [24.0, 27.0, 70.489],
+            "normal": [0.38, 0.28, 0.88]
+          }
+        ],
+        "engine": [
+          {
+            "position": [0.0, 36.844, 52.0],
+            "normal": [0, 0.99, 0.12]
+          }
+        ],
+        "battery": [
+          {
+            "position": [22.0, 31.973, 66.0],
+            "normal": [0.08, 0.89, 0.44]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-22.0, 31.957, 66.0],
+            "normal": [-0.08, 0.89, 0.44]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [0.0, 55.546, -15.0],
+            "normal": [0, 1, 0]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [35.5, 12.07, 45.0],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-35.5, 12.07, 45.0],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [35.5, 12.07, -52.59],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-35.5, 12.07, -52.59],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "Opel Corsa 2020",
+        "author": "Nieve5677",
+        "authorUrl": "https://sketchfab.com/niev",
+        "sourceUrl": "https://sketchfab.com/3d-models/opel-corsa-2020-d96f09893a344557a40551ef68d79d9b",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Corretto l'orientamento dei triangoli invertiti; semplificato (da 4,7 milioni a circa 220 mila triangoli), geometria quantizzata, texture WebP 1024 px; colore della carrozzeria modificato nell'app."
       }
     }
   ]
