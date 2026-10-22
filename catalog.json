@@ -349,6 +349,76 @@
         "retrievedOn": "2026-10-22",
         "changes": "Corretti i triangoli invertiti; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
       }
+    },
+    {
+      "id": "bmw_i3",
+      "make": "BMW",
+      "model": "i3",
+      "yearFrom": 2017,
+      "yearTo": 2022,
+      "file": "models/bmw_i3.glb",
+      "paintMaterial": "Carro_Pintura",
+      "plateMaterial": "plate",
+      "initialOrbit": "35deg 72deg 105%",
+      "anchors": {
+        "engine": [
+          {
+            "position": [0.0, 1.065, 1.402],
+            "normal": [-0.02, 0.84, 0.54]
+          }
+        ],
+        "battery": [
+          {
+            "position": [0.49, 1.033, 1.615],
+            "normal": [0.09, 0.93, 0.36]
+          }
+        ],
+        "fluids": [
+          {
+            "position": [-0.49, 1.033, 1.615],
+            "normal": [-0.09, 0.93, 0.36]
+          }
+        ],
+        "cabin": [
+          {
+            "position": [0.0, 1.645, -0.251],
+            "normal": [0.01, 1.0, -0.01]
+          }
+        ],
+        "lights": [
+          {
+            "position": [0.673, 1.006, 1.585],
+            "normal": [0.65, 0.63, 0.42]
+          }
+        ],
+        "wheels": [
+          {
+            "position": [0.876, 0.357, 1.296],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.876, 0.357, 1.296],
+            "normal": [-1, 0, 0]
+          },
+          {
+            "position": [0.876, 0.357, -1.282],
+            "normal": [1, 0, 0]
+          },
+          {
+            "position": [-0.876, 0.357, -1.282],
+            "normal": [-1, 0, 0]
+          }
+        ]
+      },
+      "attribution": {
+        "title": "2017 BMW i3",
+        "author": "tonielpro520",
+        "authorUrl": "https://sketchfab.com/tonielpro520",
+        "sourceUrl": "https://sketchfab.com/3d-models/2017-bmw-i3-983e461b3e5b4f078c4e71d5d293b09a",
+        "license": "CC-BY-4.0",
+        "retrievedOn": "2026-10-22",
+        "changes": "Corretti i triangoli invertiti; semplificati pneumatici, freni e interni; geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
+      }
     }
   ]
 }
