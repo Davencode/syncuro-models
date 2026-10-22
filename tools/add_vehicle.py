@@ -44,6 +44,8 @@ NOT_PAINT = re.compile(r'plastic|chrome|cromad|rim|roda|tyre|tire|pneu|glass|vid
 PLATE_PART = re.compile(r'plate|targa|licen[cs]e|matric', re.I)
 PLATE_HOLDER = re.compile(r'plate|targa|licen|matric|plastic|plastico', re.I)
 LIGHT = re.compile(r'light|farol|faro|lamp|head', re.I)
+HEADLIGHT = re.compile(r'head|farol|\bfaro|anterior', re.I)
+TAILLIGHT = re.compile(r'tail|lanterna|traseir|stop|brake|posterior|reverse|fanale|rear', re.I)
 
 
 def log(message):
@@ -238,6 +240,30 @@ def plate_boxes(model, lo, hi):
     return {end: box for end, box in boxes.items() if box[1][0] - box[0][0] > 0.3}
 
 
+def front_from_lights(model):
+    """+1 o -1 se fari e fanali dicono da che parte è il muso, altrimenti None."""
+    groups = {'head': set(), 'tail': set()}
+    for i, name in enumerate(model.materials):
+        head, tail = HEADLIGHT.search(name), TAILLIGHT.search(name)
+        if head and not tail:
+            groups['head'].add(i)
+        elif tail and not head:
+            groups['tail'].add(i)
+    sums = {'head': [0.0, 0], 'tail': [0.0, 0]}
+    for a, b, c, mat in model.glb.triangles():
+        for key, indices in groups.items():
+            if mat in indices:
+                sums[key][0] += (a[2] + b[2] + c[2]) / 3
+                sums[key][1] += 1
+    if sums['head'][1] < 20 or sums['tail'][1] < 20:
+        return None
+    head_z = sums['head'][0] / sums['head'][1]
+    tail_z = sums['tail'][0] / sums['tail'][1]
+    if abs(head_z - tail_z) < 1.0:
+        return None
+    return 1 if head_z > tail_z else -1
+
+
 def analyse(model, override):
     parts = model.parts
     lo = [min(p[2][k] for p in parts) for k in range(3)]
@@ -250,8 +276,10 @@ def analyse(model, override):
         sys.exit('Gomme non trovate: indica "tireMaterials" in vehicles/<id>.json.')
     cx = (lo[0] + hi[0]) / 2
     axle, wheel_y, wheel_x = find_wheels(model, tire_names, cx, (hi[0] - lo[0]) / 2)
-    # Il muso è dal lato con lo sbalzo più lungo.
-    front = 1 if (hi[2] - axle[1]) > (axle[-1] - lo[2]) else -1
+    front = override.get('front') or front_from_lights(model) or (
+        # In mancanza di luci riconoscibili: il muso è dal lato con lo sbalzo
+        # più lungo (meno affidabile con sbalzi quasi uguali).
+        1 if (hi[2] - axle[1]) > (axle[-1] - lo[2]) else -1)
 
     paint = override.get('paintMaterial')
     if not paint:
