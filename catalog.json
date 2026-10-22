@@ -76,7 +76,7 @@
       "model": "Corsa",
       "yearFrom": 2020,
       "yearTo": 2026,
-      "file": "models/opel_corsa_f.glb",
+      "file": "models/opel_corsa_f_v2.glb",
       "paintMaterial": "body",
       "initialOrbit": "35deg 72deg 105%",
       "anchors": {
@@ -136,7 +136,7 @@
         "sourceUrl": "https://sketchfab.com/3d-models/opel-corsa-2020-d96f09893a344557a40551ef68d79d9b",
         "license": "CC-BY-4.0",
         "retrievedOn": "2026-10-22",
-        "changes": "Corretto l'orientamento dei triangoli invertiti; semplificato (da 4,7 milioni a circa 220 mila triangoli), geometria quantizzata, texture WebP 1024 px; colore della carrozzeria modificato nell'app."
+        "changes": "Corretto l'orientamento dei triangoli invertiti; semplificate le parti secondarie (interni, plastiche, cromature), carrozzeria quasi intatta: da 4,7 milioni a circa 350 mila triangoli; geometria quantizzata, texture WebP 1024 px; colore della carrozzeria modificato nell'app."
       }
     }
   ]
