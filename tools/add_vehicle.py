@@ -524,6 +524,9 @@ def main():
     parser.add_argument('--id', help='es. fiat_tipo (predefinito: marca_modello)')
     args = parser.parse_args()
 
+    if not os.path.isfile(args.source):
+        sys.exit(f'File non trovato: {args.source}\n'
+                 'Suggerimento: scrivi l\'inizio del nome (es. ~/Downloads/2009) e premi Tab.')
     model_id = args.id or re.sub(r'[^a-z0-9]+', '_', f'{args.make}_{args.model}'.lower()).strip('_')
     year_from, year_to = (int(y) for y in args.years.split('-'))
     override_path = os.path.join(ROOT, 'vehicles', f'{model_id}.json')
