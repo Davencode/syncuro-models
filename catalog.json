@@ -146,8 +146,9 @@
       "model": "208",
       "yearFrom": 2020,
       "yearTo": 2026,
-      "file": "models/peugeot_208_ii.glb",
+      "file": "models/peugeot_208_ii_v2.glb",
       "paintMaterial": "Carro_Pintura",
+      "plateMaterial": "plate",
       "initialOrbit": "35deg 72deg 105%",
       "anchors": {
         "lights": [
@@ -206,7 +207,7 @@
         "sourceUrl": "https://sketchfab.com/3d-models/2021-peugeot-208-c3a458884cf7434fa99b2172c96061a4",
         "license": "CC-BY-4.0",
         "retrievedOn": "2026-10-22",
-        "changes": "Tetto in vetro reso in tinta carrozzeria; semplificati pneumatici, dischi freno e interni (da circa 540 mila a 340 mila triangoli); geometria quantizzata, texture WebP 1024 px; colore della carrozzeria modificato nell'app."
+        "changes": "Tetto in vetro reso in tinta carrozzeria; semplificati pneumatici, dischi freno e interni (da circa 540 mila a 340 mila triangoli); geometria quantizzata, texture WebP 1024 px; aggiunte targhe; colore della carrozzeria e targa modificati nell'app."
       }
     }
   ]

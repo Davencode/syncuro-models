@@ -54,6 +54,15 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    python3 tools/set_material.py corretto.glb modificato.glb Object_85=Carro_Pintura
    ```
 
+   Se il modello non ha targhe separate con UV proprie, aggiungine (l'app ci
+   disegna il numero; poi `"plateMaterial": "plate"` nel catalogo). Centro e
+   normale si misurano con `glb_tool.py ray` sul portatarga:
+
+   ```sh
+   python3 tools/add_plates.py in.glb out.glb \
+     --plate 0,0.535,2.026:0,0,1 --plate 0,0.73,-1.94:0,-0.28,-0.96
+   ```
+
    Se le gomme non si semplificano (normali sfaccettate che impediscono di
    unire i vertici), togli loro le normali prima di semplificare: la gomma
    nera non ne risente.
