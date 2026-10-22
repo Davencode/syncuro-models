@@ -60,7 +60,7 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
 
    ```sh
    python3 tools/add_plates.py in.glb out.glb \
-     --plate 0,0.535,2.026:0,0,1 --plate 0,0.73,-1.94:0,-0.28,-0.96
+     --plate 0,0.535,2.026:0,0,1 --plate 0,0.475,-1.996:0,0.31,-0.95
    ```
 
    Se le gomme non si semplificano (normali sfaccettate che impediscono di

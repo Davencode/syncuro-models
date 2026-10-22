@@ -146,7 +146,7 @@
       "model": "208",
       "yearFrom": 2020,
       "yearTo": 2026,
-      "file": "models/peugeot_208_ii_v2.glb",
+      "file": "models/peugeot_208_ii_v3.glb",
       "paintMaterial": "Carro_Pintura",
       "plateMaterial": "plate",
       "initialOrbit": "35deg 72deg 105%",
