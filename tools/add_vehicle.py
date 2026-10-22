@@ -38,7 +38,10 @@ TIRE = re.compile(r'tire|tyre|pneu|gomma|rubber|reifen', re.I)
 HIDDEN = re.compile(r'brake|freio|freno|disc|disco|caliper|pinza|interior|interno|\bint\b|seat|sedil|'
                     r'leather|engine|motor|mechanic|dashboard|speaker|wood', re.I)
 GLASS = re.compile(r'glass|vidro|vetro|window|glas|vitre|cristal', re.I)
-PAINT = re.compile(r'paint|pintura|carroz|vernice|lack|body|carpaint|car_paint', re.I)
+PAINT = re.compile(r'paint|pintura|carroz|vernice|body|carpaint|car_paint', re.I)
+NOT_PAINT = re.compile(r'plastic|chrome|cromad|rim|roda|tyre|tire|pneu|glass|vidro|window|light|farol|'
+                       r'plate|targa|rubber|interior|interno', re.I)
+PLATE_PART = re.compile(r'plate|targa|licen[cs]e|matric', re.I)
 PLATE_HOLDER = re.compile(r'plate|targa|licen|matric|plastic|plastico', re.I)
 LIGHT = re.compile(r'light|farol|faro|lamp|head', re.I)
 
@@ -180,6 +183,61 @@ def check_license(glb):
             'sourceUrl': extras['source'], 'license': license_id}
 
 
+def _percentile(values, fraction):
+    ordered = sorted(values)
+    return ordered[min(len(ordered) - 1, max(0, int(fraction * len(ordered))))]
+
+
+def find_wheels(model, tire_names, cx, half_width):
+    """Assali e ruote dai vertici delle gomme, anche se le gomme sono unite in
+    pochi pezzi: i vertici si addensano attorno ai due assali."""
+    indices = {model.materials.index(n) for n in tire_names if n in model.materials}
+    points = [p for a, b, c, mat in model.glb.triangles() if mat in indices for p in (a, b, c)
+              if abs(p[0] - cx) > 0.3 * half_width]
+    if len(points) < 100:
+        sys.exit('Gomme non trovate: indica "tireMaterials" in vehicles/<id>.json.')
+    bins = {}
+    for p in points:
+        bins[round(p[2] / 0.05)] = bins.get(round(p[2] / 0.05), 0) + 1
+    ranked = sorted(bins, key=bins.get, reverse=True)
+    first = ranked[0]
+    second = next((b for b in ranked if abs(b - first) * 0.05 > 1.5), None)
+    if second is None:
+        sys.exit('Non trovo due assali: indica "tireMaterials" in vehicles/<id>.json.')
+    axle, ys, xs = {}, [], []
+    for peak in (first, second):
+        # Il picco può cadere sul bordo della gomma: il centro della ruota è
+        # il punto medio della sua estensione, ricalcolato due volte.
+        zc = peak * 0.05
+        for window in (0.6, 0.45):
+            near = [p[2] for p in points if abs(p[2] - zc) < window]
+            zc = (_percentile(near, 0.01) + _percentile(near, 0.99)) / 2
+        axle[1 if zc > (first + second) * 0.025 else -1] = zc
+        wheel = [p for p in points if abs(p[2] - zc) < 0.45]
+        ys += [(_percentile([p[1] for p in wheel], 0.01) + _percentile([p[1] for p in wheel], 0.99)) / 2]
+        xs.append(_percentile([abs(p[0] - cx) for p in wheel], 0.99))
+    return axle, sum(ys) / len(ys), max(xs)
+
+
+def plate_boxes(model, lo, hi):
+    """Ingombro dei portatarga del modello vicino a ciascuna estremità (+Z e
+    -Z), dai vertici: spesso un unico pezzo contiene entrambi i portatarga."""
+    indices = {i for i, n in enumerate(model.materials) if PLATE_PART.search(n)}
+    if not indices:
+        return {}
+    boxes = {}
+    for a, b, c, mat in model.glb.triangles():
+        if mat not in indices:
+            continue
+        for p in (a, b, c):
+            for end, z in ((1, hi[2]), (-1, lo[2])):
+                if abs(p[2] - z) < 0.4:
+                    box = boxes.setdefault(end, [list(p), list(p)])
+                    box[0] = [min(x, y) for x, y in zip(box[0], p)]
+                    box[1] = [max(x, y) for x, y in zip(box[1], p)]
+    return {end: box for end, box in boxes.items() if box[1][0] - box[0][0] > 0.3}
+
+
 def analyse(model, override):
     parts = model.parts
     lo = [min(p[2][k] for p in parts) for k in range(3)]
@@ -188,31 +246,19 @@ def analyse(model, override):
         sys.exit('L\'auto è orientata lungo X: per ora sono supportati solo modelli lungo Z.')
 
     tire_names = override.get('tireMaterials') or [m for m in model.materials if TIRE.search(m)]
-    tires = [p for p in parts if p[1] & set(tire_names)]
-    if not tires:
+    if not tire_names:
         sys.exit('Gomme non trovate: indica "tireMaterials" in vehicles/<id>.json.')
     cx = (lo[0] + hi[0]) / 2
-    cz = (lo[2] + hi[2]) / 2
-    wheels = {}
-    for _, _, plo, phi, _ in tires:
-        key = (1 if (plo[0] + phi[0]) / 2 > cx else -1, 1 if (plo[2] + phi[2]) / 2 > cz else -1)
-        w = wheels.setdefault(key, [list(plo), list(phi)])
-        w[0] = [min(a, b) for a, b in zip(w[0], plo)]
-        w[1] = [max(a, b) for a, b in zip(w[1], phi)]
-    if len(wheels) != 4:
-        sys.exit(f'Trovate {len(wheels)} ruote invece di 4: controlla "tireMaterials".')
-    axle = {s: sum((w[0][2] + w[1][2]) / 2 for k, w in wheels.items() if k[1] == s) / 2 for s in (1, -1)}
+    axle, wheel_y, wheel_x = find_wheels(model, tire_names, cx, (hi[0] - lo[0]) / 2)
     # Il muso è dal lato con lo sbalzo più lungo.
     front = 1 if (hi[2] - axle[1]) > (axle[-1] - lo[2]) else -1
-    wheel_y = sum((w[0][1] + w[1][1]) / 2 for w in wheels.values()) / 4
-    wheel_x = max(max(abs(w[0][0] - cx), abs(w[1][0] - cx)) for w in wheels.values())
 
     paint = override.get('paintMaterial')
     if not paint:
         length = hi[2] - lo[2]
         best = None
         for name, tris in model.triangles_by_material().items():
-            if model.is_glass(name) or model.has_texture(name) or TIRE.search(name):
+            if model.is_glass(name) or model.has_texture(name) or NOT_PAINT.search(name):
                 continue
             spans = [p for p in parts if name in p[1]]
             z0 = min(p[2][2] for p in spans)
@@ -226,6 +272,8 @@ def analyse(model, override):
         paint = best[1]
 
     paint_top = max(p[3][1] for p in parts if paint in p[1])
+    ground = lo[1]
+    height = paint_top - ground
     roof = override.get('glassRoofNodes')
     if roof is None:
         roof = []
@@ -234,14 +282,16 @@ def analyse(model, override):
             if not mats or not all(model.is_glass(m) for m in mats):
                 continue
             centred = abs((plo[0] + phi[0]) / 2 - cx) < 0.15 * width
-            high = plo[1] > 0.8 * paint_top
-            flat = (phi[1] - plo[1]) < 0.15 * paint_top
+            high = plo[1] - ground > 0.8 * height
+            flat = (phi[1] - plo[1]) < 0.15 * height
             between = min(axle.values()) - 0.2 < plo[2] and phi[2] < max(axle.values()) + 0.2
             long = (phi[2] - plo[2]) > 0.2 * (hi[2] - lo[2])
             if centred and high and flat and between and long:
                 roof.append(name)
     return {'lo': lo, 'hi': hi, 'cx': cx, 'front': front, 'axle': axle, 'wheel_y': wheel_y,
-            'wheel_x': wheel_x, 'paint': paint, 'paint_top': paint_top, 'roof': roof,
+            'wheel_x': wheel_x, 'paint': paint, 'paint_top': paint_top, 'ground': ground,
+            'height': height, 'roof': roof,
+            'plate_boxes': plate_boxes(model, lo, hi),
             'tires': tire_names, 'hidden': [m for m in model.materials if HIDDEN.search(m)]}
 
 
@@ -294,7 +344,7 @@ def anchors(ray, info):
     }
     light = None
     for frac in (0.62, 0.58, 0.66, 0.54, 0.7, 0.5):
-        hit = ray.cast((cx + 0.33 * width, info['paint_top'] * frac, front_end + s), 2, -s)
+        hit = ray.cast((cx + 0.33 * width, info['ground'] + info['height'] * frac, front_end + s), 2, -s)
         if hit and (light is None or LIGHT.search(hit['material'] or '')):
             light = hit
             if LIGHT.search(hit['material'] or ''):
@@ -313,14 +363,23 @@ def anchors(ray, info):
 
 
 def find_plate(ray, info, end):
-    """Zona piatta e verticale al centro del muso (end=1) o della coda (end=-1)."""
+    """Portatarga del muso (end=1) o della coda (end=-1): quello del modello se
+    c'è un materiale apposito, altrimenti una zona piatta e verticale."""
     lo, hi, cx, s = info['lo'], info['hi'], info['cx'], info['front']
     out = s * end
     tip = (hi[2] if out > 0 else lo[2]) + out
-    top = info['paint_top']
+    box = info['plate_boxes'].get(out)
+    if box:
+        plo, phi = box
+        px, py = (plo[0] + phi[0]) / 2, (plo[1] + phi[1]) / 2
+        hit = ray.cast((px, py, tip), 2, -out)
+        if hit:
+            n = hit['normal']
+            return (f'{px:.3f},{py:.3f},{hit["position"][2] + out * 0.008:.3f}:'
+                    f'{n[0]:.2f},{n[1]:.2f},{n[2]:.2f}')
     hits = []
-    y = 0.15 * top
-    while y < 0.75 * top:
+    y = info['ground'] + 0.15 * info['height']
+    while y < info['ground'] + 0.75 * info['height']:
         hit = ray.cast((cx, y, tip), 2, -out)
         if hit:
             hits.append((y, hit))
