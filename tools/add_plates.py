@@ -52,8 +52,13 @@ def main():
     parser.add_argument('output')
     parser.add_argument('--plate', action='append', required=True, help='cx,cy,cz:nx,ny,nz')
     args = parser.parse_args()
+    add_plates(args.input, args.output, args.plate)
+    print(f'{len(args.plate)} targhe aggiunte -> {args.output}')
 
-    with open(args.input, 'rb') as f:
+
+def add_plates(input_path, output_path, plates):
+    """[plates]: lista di stringhe "cx,cy,cz:nx,ny,nz"."""
+    with open(input_path, 'rb') as f:
         data = f.read()
     json_length = struct.unpack_from('<I', data, 12)[0]
     gltf = json.loads(data[20:20 + json_length])
@@ -91,7 +96,7 @@ def main():
         return len(gltf['accessors']) - 1
 
     primitives = []
-    for spec in args.plate:
+    for spec in plates:
         center_text, normal_text = spec.split(':')
         center = tuple(float(v) for v in center_text.split(','))
         normal = tuple(float(v) for v in normal_text.split(','))
@@ -119,13 +124,12 @@ def main():
     chunk = json.dumps(gltf, separators=(',', ':')).encode()
     chunk += b' ' * ((4 - len(chunk) % 4) % 4)
     total = 12 + 8 + len(chunk) + 8 + len(binary)
-    with open(args.output, 'wb') as f:
+    with open(output_path, 'wb') as f:
         f.write(struct.pack('<III', 0x46546C67, 2, total))
         f.write(struct.pack('<II', len(chunk), 0x4E4F534A))
         f.write(chunk)
         f.write(struct.pack('<II', len(binary), 0x004E4942))
         f.write(binary)
-    print(f'{len(args.plate)} targhe aggiunte -> {args.output}')
 
 
 if __name__ == '__main__':

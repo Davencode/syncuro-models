@@ -35,7 +35,41 @@ cache per nome: se un modello cambia, va salvato con un nome nuovo (es.
 Ogni modello ha la propria licenza (vedi `CREDITS.md`); il repository non ha
 una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
 
-## Aggiungere un modello
+## Aggiungere un modello (automatico)
+
+```sh
+(cd tools && npm install)   # solo la prima volta
+python3 tools/add_vehicle.py ~/Downloads/auto.glb --make Fiat --model Tipo --years 2016-2026
+```
+
+In circa un minuto: controlla la licenza (solo CC BY 4.0 o CC0, letta dai
+metadati Sketchfab), corregge i triangoli invertiti, trova ruote, muso,
+vernice ed eventuale tetto in vetro (reso in tinta), semplifica gomme,
+freni e interni, calcola i punti dei componenti, trova i portatarga e ci
+mette le targhe, poi scrive catalogo e crediti. Genera
+`build/<id>/preview.png`: quattro inquadrature dell'auto rossa con targa e
+punti. Se va bene: commit e `tools/publish.sh vX.Y.Z`.
+
+Se una scelta automatica è sbagliata, correggila in `vehicles/<id>.json` e
+rilancia. Chiavi possibili:
+
+```json
+{
+  "paintMaterial": "Carro_Pintura",
+  "tireMaterials": ["Carro_Pneu1"],
+  "glassRoofNodes": [],
+  "frontPlate": "0,0.535,2.026:0,0,1",
+  "rearPlate": "0,0.475,-1.996:0,0.31,-0.95",
+  "noPlates": true,
+  "initialOrbit": "35deg 72deg 105%",
+  "anchors": {"cabin": [{"position": [0, 1.44, -0.3], "normal": [0, 1, 0]}]}
+}
+```
+
+Limiti attuali: auto orientate lungo Z con Y in alto, e una gomma per ruota
+(non un'unica mesh per le due ruote di un lato).
+
+## Aggiungere un modello (a mano)
 
 1. **Scarica il `.glb` originale** e verifica la licenza (vedi la guida
    `docs/modelli-3d.md` nel repository dell'app).
