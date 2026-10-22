@@ -58,9 +58,24 @@ una licenza unica. Sono ammesse solo CC0 e CC BY 4.0: l'app scarta le altre.
    node tools/simplify_except.mjs passo1.glb ridotto.glb '!body' 0.3 0.0001
    ```
 
-   Il terzo argomento è il materiale della carrozzeria (`!` davanti: solo
-   quello), poi la quota di vertici da tenere e la tolleranza (frazione
-   dell'ingombro). Ricontrolla sempre l'aspetto.
+   Il terzo argomento è l'elenco dei materiali (`!` davanti: solo quelli),
+   poi la quota di vertici da tenere, la tolleranza (frazione dell'ingombro)
+   e i materiali senza texture di cui tenere le UV (es. `plate`).
+
+   Le superfici lucide e grandi (vernice, tetto nero lucido, pannelli scuri
+   dietro i vetri) mostrano ogni deformazione nei riflessi: lasciale intatte
+   o con tolleranza minima (`0.00005`). Per la Corsa:
+
+   ```sh
+   K=body,black_shiny,black_matt,black,interior,plate,glass,d_glass
+   node tools/simplify_except.mjs corretto.glb p1.glb $K 0.05 0.005 plate
+   node tools/simplify_except.mjs p1.glb p2.glb '!black_matt,interior,plate,glass,d_glass' 0.2 0.0005 plate
+   node tools/simplify_except.mjs p2.glb ridotto.glb '!black_shiny,black' 0.5 0.00005 plate
+   ```
+
+   Poi, nell'ottimizzazione, aggiungi `--prune-attributes false` per non
+   perdere le UV della targa. Ricontrolla sempre l'aspetto confrontandolo con
+   l'originale.
 4. **Ottimizzalo** in `models/<marca>_<modello>_<generazione>.glb`:
 
    ```sh
